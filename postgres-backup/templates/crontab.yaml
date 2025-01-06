@@ -1,0 +1,102 @@
+{{- range .Values.retention }}
+  {{- if .enabled }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.namespace }}
+  labels:
+    {{- include "postgres-backup.labels" . | nindent 4 }}
+spec:
+  schedule: "{{ . }}"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "postgres-backup.selectorLabels" . | nindent 8 }}
+          annotations:
+            {{- toYaml .Values.podAnnotations | nindent 8 }}
+          labels:
+            {{- include "postgres-backup.selectorLabels" . | nindent 8 }}
+        spec:
+          imagePullSecrets:
+            {{- toYaml .Values.imagePullSecrets | nindent 20 }}
+          serviceAccountName: {{ include "postgres-backup.serviceAccountName" . }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 20 }}
+          containers:
+            - name: "{{ . }}-create-directory"
+              image: "alpine:3.7"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              resources:
+                {{- toYaml .Values.resources | nindent 24 }}
+              volumeMounts:
+                - name: backupVolume
+                  mountPath: /backup
+              command:
+                - /bin/sh
+                - -c
+                - mkdir -p /backup/{{ .Values.namespace }}/{{ .Values.db.database }}/{{ . }}
+            - name: "{{ . }}-backup"
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+                resources:
+                  {{- toYaml .Values.resources | nindent 24 }}
+              env:
+                - name: POSTGRES_HOST
+                  value: {{ .Values.db.host }}
+                - name: POSTGRES_PORT
+                  value: {{ .Values.db.port }}
+                - name: POSTGRES_USER
+                  from:
+                    secretKeyRef:
+                      name: {{ .Values.db.userSecret.name }}
+                      key: {{ .Values.db.userSecret.key }}
+                - name: POSTGRES_PASSWORD
+                  from:
+                    secretKeyRef:
+                      name: {{ .Values.db.passwordSecret.name }}
+                      key: {{ .Values.db.passwordSecret.key }}
+                - name: POSTGRES_DB
+                  value: {{ .Values.db.database }}
+              command:
+                - /bin/sh
+                - -c
+                - pg_dump -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER $POSTGRES_DB > /backup/{{ .Values.namespace }}/{{ .Values.db.database }}/{{ . }}/{{ .Values.db.database }}-$(date +%Y%m%d%H%M%S).sql
+              volumeMounts:
+                - name: backupVolume
+                  mountPath: {{ .Values.mountPath }}
+            - name: "{{ . }}-delete-old-backups"
+              image: "{{ .Values.alpineImage.repository }}:{{ .Values.alpineImage.tag }}"
+              imagePullPolicy: {{ .Values.alpineImage.pullPolicy }}
+              env:
+                - name: BACKUP_DIR
+                  value: /backup/{{ .Values.namespace }}/{{ .Values.db.database }}/{{ . }}
+                - name: RETENTION
+                  value: {{ .Values.retention }}
+                command:
+                  - /bin/sh
+                  - -c
+                  - find $BACKUP_DIR -type f -mtime +$RETENTION -exec rm -f {} \;
+              volumeMounts:
+                - name: backupVolume
+                  mountPath: /backup
+          volumes:
+            - name: backupVolume
+              {{- toYaml .Values.backupVolume | nindent 20 }}
+          restartPolicy: OnFailure
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+              {{- toYaml . | nindent 20 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+              {{- toYaml . | nindent 20 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+              {{- toYaml . | nindent 20 }}
+          {{- end }}
+  {{- end }}
+{{- end }}

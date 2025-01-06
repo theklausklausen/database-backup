@@ -1,0 +1,6 @@
+**/Makefile
+**/*.yml
+**/*.yaml
+**/Dockerfile
+**/_test/**/*
+**/_out/**/*

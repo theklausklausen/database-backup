@@ -1,0 +1,19 @@
+---
+tabWidth: 2
+useTabs: false
+singleQuote: true
+quoteProps: 'preserve'
+bracketSpacing: false
+endOfLine: 'lf'
+printWidth: 1600
+overrides:
+  - files: '**/*.{ps,js,ts,json,yml,yaml}'
+    options:
+      semi: true
+  - files: '**/*.html'
+    options:
+      parser: 'html'
+      semi: true
+      bracketSameLine: false
+      htmlWhitespaceSensitivity: 'ignore'
+      singleAttributesPerLine: false
