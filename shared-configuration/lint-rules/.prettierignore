@@ -4,3 +4,4 @@
 **/Dockerfile
 **/_test/**/*
 **/_out/**/*
+**/gl-secret-detection-report.json
