@@ -63,12 +63,12 @@ secret scan:
 package helm:
   extends: .package_helm_chart
   variables:
-    HELM_CHART_DIR: ./postgres-backup
+    HELM_CHART_DIR: .
     PACKAGE_NAME: ${CI_PROJECT_NAME}
 
 # deploy
 deploy helm:
   extends: .deploy_helm_chart
   variables:
-    HELM_CHART_DIR: ./postgres-backup
+    HELM_CHART_DIR: .
     PACKAGE_NAME: ${CI_PROJECT_NAME}
