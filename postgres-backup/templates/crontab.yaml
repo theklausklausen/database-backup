@@ -8,7 +8,7 @@ metadata:
   labels:
     {{- include "postgres-backup.labels" . | nindent 4 }}
 spec:
-  schedule: "{{ . }}"
+  schedule: "@{{ . }}"
   jobTemplate:
     spec:
       template:
@@ -27,7 +27,7 @@ spec:
             {{- toYaml .Values.podSecurityContext | nindent 20 }}
           containers:
             - name: "{{ . }}-create-directory"
-              image: "alpine:3.7"
+              image: "{{ .Values.alpineImage.repository }}:{{ .Values.alpineImage.tag }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               resources:
                 {{- toYaml .Values.resources | nindent 24 }}
@@ -63,7 +63,12 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - pg_dump -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER $POSTGRES_DB > /backup/{{ .Values.namespace }}/{{ .Values.db.database }}/{{ . }}/{{ .Values.db.database }}-$(date +%Y%m%d%H%M%S).sql
+                - >-
+                  pg_dump 
+                    -h $POSTGRES_HOST
+                    -p $POSTGRES_PORT
+                    -U $POSTGRES_USER $POSTGRES_DB >
+                    /backup/{{ .Values.namespace }}/{{ .Values.db.database }}/{{ . }}/{{ .Values.db.database }}-$(date +%Y%m%d%H%M%S).sql
               volumeMounts:
                 - name: backupVolume
                   mountPath: {{ .Values.mountPath }}
@@ -74,11 +79,31 @@ spec:
                 - name: BACKUP_DIR
                   value: /backup/{{ .Values.namespace }}/{{ .Values.db.database }}/{{ . }}
                 - name: RETENTION
-                  value: {{ .Values.retention }}
+                  value: {{ .Values.retention | index . }}
+                - name: KEEP
+                  value: {{ .keep }}
+                - name: TZ
+                  value: {{ .Values.timezone | default "Europe/Berlin" }}
                 command:
                   - /bin/sh
                   - -c
-                  - find $BACKUP_DIR -type f -mtime +$RETENTION -exec rm -f {} \;
+                  - >-
+                    if [ "$RETENTION" == "yearly" ]; then
+                      KEEP=$(($KEEP * 365))
+                    elif [ "$RETENTION" == "monthly" ]; then
+                      KEEP=$(($KEEP * 30))
+                    elif [ "$RETENTION" == "weekly" ]; then
+                      KEEP=$(($KEEP * 7 * 24))
+                    elif [ "$RETENTION" == "daily" ]; then
+                      KEEP=$(($KEEP))
+                    elif [ "$RETENTION" == "hourly" ]; then
+                      KEEP=$(($KEEP))
+                    else
+                      echo "No valid retention period given"
+                      exit 1
+                    fi
+                    KEEP=$($KEEP *24 * 60)
+                    find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \;
               volumeMounts:
                 - name: backupVolume
                   mountPath: /backup
