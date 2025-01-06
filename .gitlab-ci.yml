@@ -45,13 +45,13 @@ prettier lint:
 helm lint:
   extends: .helm_lint
   variables:
-    HELM_CHART_DIR: ${CI_PROJECT_DIR}
+    HELM_CHART_DIR: ./postgres-backup
 
 # test
 render helm chart:
   extends: .render_helm_chart
   variables:
-    HELM_CHART_DIR: ${CI_PROJECT_DIR}
+    HELM_CHART_DIR: ./postgres-backup
 
 # security
 package scan:
@@ -63,12 +63,12 @@ secret scan:
 package helm:
   extends: .package_helm_chart
   variables:
-    HELM_CHART_DIR: ${CI_PROJECT_DIR}
+    HELM_CHART_DIR: ./postgres-backup
     PACKAGE_NAME: ${CI_PROJECT_NAME}
 
 # deploy
 deploy helm:
   extends: .deploy_helm_chart
   variables:
-    HELM_CHART_DIR: ${CI_PROJECT_DIR}
+    HELM_CHART_DIR: ./postgres-backup
     PACKAGE_NAME: ${CI_PROJECT_NAME}
