@@ -1,0 +1,74 @@
+---
+include:
+  - project: 'klausklausen/templates'
+    ref: main
+    file: 'test.yml'
+  - project: 'klausklausen/templates'
+    ref: main
+    file: 'deploy.yml'
+  - project: 'klausklausen/templates'
+    ref: main
+    file: 'build.yml'
+  - project: 'klausklausen/templates'
+    ref: main
+    file: 'package.yml'
+  - project: 'klausklausen/templates'
+    ref: main
+    file: 'deploy.yml'
+  - project: 'klausklausen/templates'
+    ref: main
+    file: 'lint.yml'
+  - project: 'klausklausen/templates'
+    ref: main
+    file: 'security.yml'
+
+variables:
+  TAG: $CI_COMMIT_BRANCH
+  GO_IMAGE: golang:1.23
+
+stages:
+  - security
+  - lint
+  - test
+  - build
+  - package
+  - deploy
+  - publish
+
+# lint
+markdown lint:
+  extends: .markdown_lint
+yaml lint:
+  extends: .yaml_lint
+prettier lint:
+  extends: .prettier
+helm lint:
+  extends: .helm_lint
+  variables:
+    HELM_CHART_DIR: $CI_PROJECT_DIR}
+
+# test
+render helm chart:
+  extends: .render_helm_chart
+  variables:
+    HELM_CHART_DIR: $CI_PROJECT_DIR}
+
+# security
+package scan:
+  extends: .package_scan
+secret scan:
+  extends: .secret_scan
+
+# package
+package helm:
+  extends: .package_helm_chart
+  variables:
+    HELM_CHART_DIR: $CI_PROJECT_DIR}
+    PACKAGE_NAME: ${CI_PROJECT_NAME}
+
+# deploy
+deploy helm:
+  extends: .deploy_helm_chart
+  variables:
+    HELM_CHART_DIR: $CI_PROJECT_DIR}
+    PACKAGE_NAME: ${CI_PROJECT_NAME}
