@@ -91,23 +91,22 @@ affinity: {}
 
 retention:
   hourly:
-    enabled: false
-    keep: 24
+    enabled: true
+    keep: 3
   daily:
-    enabled: false
-    keep: 7
+    enabled: true
+    keep: 3
   weekly:
-    enabled: false
-    keep: 4
+    enabled: true
+    keep: 3
   monthly:
-    enabled: false
-    keep: 12
+    enabled: true
+    keep: 2
   yearly:
-    enabled: false
+    enabled: true
     keep: 2
 
 db:
-  type: postgres
   host: localhost
   port: 5432
   userSecret:
