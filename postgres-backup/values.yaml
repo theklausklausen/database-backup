@@ -16,10 +16,10 @@ alpineImage:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "3.7"
 
-namespace: ""
+namespace: "postgres-backup"
 
 imagePullSecrets: []
-nameOverride: ""
+nameOverride: "postgres-backup"
 fullnameOverride: ""
 
 serviceAccount:
@@ -110,10 +110,10 @@ db:
   host: localhost
   port: 5432
   userSecret:
-    secret: ""
+    name: ""
     key: ""
-  password-secret:
-    secret: ""
+  passwordSecret:
+    name: ""
     key: ""
   database: postgres
 
