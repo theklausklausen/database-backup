@@ -16,23 +16,23 @@ spec:
       template:
         metadata:
           labels:
-            {{- include "postgres-backup.selectorLabels" $ | nindent 8 }}
+            {{- include "postgres-backup.selectorLabels" $ | nindent 12 }}
           annotations:
-            {{- toYaml $.Values.podAnnotations | nindent 8 }}
+            {{- toYaml $.Values.podAnnotations | nindent 12 }}
           labels:
-            {{- include "postgres-backup.selectorLabels" $ | nindent 8 }}
+            {{- include "postgres-backup.selectorLabels" $ | nindent 12 }}
         spec:
           imagePullSecrets:
-            {{- toYaml $.Values.imagePullSecrets | nindent 20 }}
+            {{- toYaml $.Values.imagePullSecrets | nindent 12 }}
           serviceAccountName: {{ include "postgres-backup.serviceAccountName" $ }}
           securityContext:
-            {{- toYaml $.Values.podSecurityContext | nindent 20 }}
+            {{- toYaml $.Values.podSecurityContext | nindent 12 }}
           containers:
             - name: "{{ $key }}-create-directory"
               image: "{{ $.Values.alpineImage.repository }}:{{ $.Values.alpineImage.tag }}"
               imagePullPolicy: {{ $.Values.image.pullPolicy }}
               resources:
-                {{- toYaml $.Values.resources | nindent 24 }}
+                {{- toYaml $.Values.resources | nindent 16 }}
               volumeMounts:
                 - name: backupVolume
                   mountPath: /backup
@@ -43,8 +43,8 @@ spec:
             - name: "{{ . }}-backup"
               image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
               imagePullPolicy: {{ $.Values.image.pullPolicy }}
-                resources:
-                  {{- toYaml $.Values.resources | nindent 24 }}
+              resources:
+                {{- toYaml $.Values.resources | nindent 16 }}
               env:
                 - name: POSTGRES_HOST
                   value: {{ $.Values.db.host }}
@@ -77,6 +77,8 @@ spec:
             - name: "{{ . }}-delete-old-backups"
               image: "{{ $.Values.alpineImage.repository }}:{{ $.Values.alpineImage.tag }}"
               imagePullPolicy: {{ $.Values.alpineImage.pullPolicy }}
+              resources:
+                {{- toYaml $.Values.resources | nindent 16 }}
               env:
                 - name: BACKUP_DIR
                   value: /backup/{{ $.Values.namespace }}/{{ $.Values.db.database }}/{{ . }}
@@ -86,44 +88,44 @@ spec:
                   value: {{ $value.keep }}
                 - name: TZ
                   value: {{ $.Values.timezone | default "Europe/Berlin" }}
-                command:
-                  - /bin/sh
-                  - -c
-                  - >-
-                    if [ "$RETENTION" == "yearly" ]; then
-                      KEEP=$(($KEEP * 365))
-                    elif [ "$RETENTION" == "monthly" ]; then
-                      KEEP=$(($KEEP * 30))
-                    elif [ "$RETENTION" == "weekly" ]; then
-                      KEEP=$(($KEEP * 7 * 24))
-                    elif [ "$RETENTION" == "daily" ]; then
-                      KEEP=$(($KEEP))
-                    elif [ "$RETENTION" == "hourly" ]; then
-                      KEEP=$(($KEEP))
-                    else
-                      echo "No valid retention period given"
-                      exit 1
-                    fi
-                    KEEP=$($KEEP *24 * 60)
-                    find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \;
+              command:
+                - /bin/sh
+                - -c
+                - >-
+                  if [ "$RETENTION" == "yearly" ]; then
+                    KEEP=$(($KEEP * 365))
+                  elif [ "$RETENTION" == "monthly" ]; then
+                    KEEP=$(($KEEP * 30))
+                  elif [ "$RETENTION" == "weekly" ]; then
+                    KEEP=$(($KEEP * 7 * 24))
+                  elif [ "$RETENTION" == "daily" ]; then
+                    KEEP=$(($KEEP))
+                  elif [ "$RETENTION" == "hourly" ]; then
+                    KEEP=$(($KEEP))
+                  else
+                    echo "No valid retention period given"
+                    exit 1
+                  fi
+                  KEEP=$($KEEP *24 * 60)
+                  find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \;
               volumeMounts:
                 - name: backupVolume
                   mountPath: /backup
           volumes:
             - name: backupVolume
-              {{- toYaml $.Values.backupVolume | nindent 20 }}
+              {{- toYaml $.Values.backupVolume | nindent 14 }}
           restartPolicy: OnFailure
           {{- with $.Values.nodeSelector }}
           nodeSelector:
-              {{- toYaml . | nindent 20 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with $.Values.affinity }}
           affinity:
-              {{- toYaml . | nindent 20 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with $.Values.tolerations }}
           tolerations:
-              {{- toYaml . | nindent 20 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
   {{- end }}
 {{- end }}
