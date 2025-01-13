@@ -53,13 +53,13 @@ spec:
                 - name: POSTGRES_USER
                   from:
                     secretKeyRef:
-                      name: {{ $root.Values.db.userSecret.name }}
-                      key: {{ $root.Values.db.userSecret.key }}
-                # - name: POSTGRES_PASSWORD
-                #   from:
-                #     secretKeyRef:
-                #       name: {{ $root.Values.db.passwordSecret.name }}
-                #       key: {{ $root.Values.db.passwordSecret.key }}
+                      name: "{{ $root.Values.db.userSecret.name }}"
+                      key: "{{ $root.Values.db.userSecret.key }}"
+                - name: POSTGRES_PASSWORD
+                  from:
+                    secretKeyRef:
+                      name: "{{ $root.Values.db.passwordSecret.name }}"
+                      key: "{{ $root.Values.db.passwordSecret.key }}"
                 - name: POSTGRES_DB
                   value: "{{ $root.Values.db.database }}"
               command:
