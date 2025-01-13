@@ -111,7 +111,7 @@ spec:
                   mountPath: /backup
           volumes:
             - name: backupvolume
-              {{- toYaml $root.Values.backupvolume | nindent 14 }}
+              {{- toYaml $root.Values.backupvolume | nindent 12 }}
           restartPolicy: OnFailure
           {{- with $root.Values.nodeSelector }}
           nodeSelector:
