@@ -5,7 +5,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ $root.Values.nameOverride }}
+  name: {{ $root.Values.nameOverride }}-{{ $key }}
   namespace: {{ $root.Values.namespace }}
   labels:
     {{- include "postgres-backup.labels" $ | nindent 4 }}
