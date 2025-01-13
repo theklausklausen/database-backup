@@ -119,5 +119,5 @@ db:
   database: postgres
 
 volume:
-#  persistentVolumeClaim:
-#    claimName: ""
+  persistentVolumeClaim:
+    claimName: ""
