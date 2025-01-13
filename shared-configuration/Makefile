@@ -30,8 +30,7 @@ go-lint: ## Lints all go files
 	docker run --rm --user 1000:1000 -v $(PWD):/src -w /src registry.gitlab.com/pipeline-components/go-lint:latest sh -c 'golint -set_exit_status ./...'
 
 helm-lint: ## Lints all helm files
-	echo $(HELM_FILES)
-	docker run --rm --user 1000:1000 -v $(HELM_FILES):/src -w /src repo.kk.int/infra-images/helm sh -c 'ls -lah /src && helm lint /src'
+	docker run --rm --user 1000:1000 -v $(HELM_FILES):/src -w /src repo.kk.int/infra-images/helm sh -c 'helm lint /src'
 
 helm-render: ## Renders helm templates
 	docker run --rm --user 1000:1000 -v $(HELM_FILES):/src -w /src repo.kk.int/infra-images/helm sh -c 'helm template /src'

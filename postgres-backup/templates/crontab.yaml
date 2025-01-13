@@ -39,8 +39,8 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ . }}
-            - name: "{{ . }}-backup"
+                - mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
+            - name: "{{ $key }}-backup"
               image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag }}"
               imagePullPolicy: {{ $root.Values.image.pullPolicy }}
               resources:
@@ -70,18 +70,18 @@ spec:
                     -h $POSTGRES_HOST
                     -p $POSTGRES_PORT
                     -U $POSTGRES_USER $POSTGRES_DB >
-                    /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ . }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql
+                    /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql
               volumeMounts:
                 - name: backupVolume
                   mountPath: {{ $root.Values.mountPath }}
-            - name: "{{ . }}-delete-old-backups"
+            - name: "{{ $key }}-delete-old-backups"
               image: "{{ $root.Values.alpineImage.repository }}:{{ $root.Values.alpineImage.tag }}"
               imagePullPolicy: {{ $root.Values.alpineImage.pullPolicy }}
               resources:
                 {{- toYaml $root.Values.resources | nindent 16 }}
               env:
                 - name: BACKUP_DIR
-                  value: /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ . }}
+                  value: /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
                 - name: RETENTION
                   value: {{ $key }}
                 - name: KEEP
