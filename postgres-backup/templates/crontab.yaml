@@ -1,6 +1,6 @@
 {{- $root := . -}}
 {{- range $key, $value := .Values.retention }}
-  {{- if $value.enabled }}
+  {{- if $value.enabled | default false }}
 ---
 apiVersion: batch/v1
 kind: CronJob
