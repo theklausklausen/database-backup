@@ -85,7 +85,7 @@ spec:
                 - name: RETENTION
                   value: {{ $key }}
                 - name: KEEP
-                  value: {{ $value.keep }}
+                  value: {{ $value.keep.Value }}
                 - name: TZ
                   value: {{ $root.Values.timezone | default "Europe/Berlin" }}
               command:
