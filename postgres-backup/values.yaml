@@ -110,11 +110,11 @@ db:
   host: localhost
   port: 5432
   userSecret:
-    name: ""
-    key: ""
+    name: "secret"
+    key: "username"
   passwordSecret:
-    name: ""
-    key: ""
+    name: "secret"
+    key: "password"
   database: postgres
 
 backupvolume:

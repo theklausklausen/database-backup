@@ -19,8 +19,6 @@ spec:
             {{- include "postgres-backup.selectorLabels" $ | nindent 12 }}
           annotations:
             {{- toYaml $root.Values.podAnnotations | nindent 12 }}
-          labels:
-            {{- include "postgres-backup.selectorLabels" $ | nindent 12 }}
         spec:
           imagePullSecrets:
             {{- toYaml $root.Values.imagePullSecrets | nindent 12 }}
