@@ -34,7 +34,7 @@ spec:
               resources:
                 {{- toYaml $root.Values.resources | nindent 16 }}
               volumeMounts:
-                - name: backupVolume
+                - name: backup-volume
                   mountPath: /backup
               command:
                 - /bin/sh
@@ -72,7 +72,7 @@ spec:
                     -U $POSTGRES_USER $POSTGRES_DB >
                     /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql
               volumeMounts:
-                - name: backupVolume
+                - name: backup-volume
                   mountPath: {{ $root.Values.mountPath }}
             - name: "{{ $key }}-delete-old-backups"
               image: "{{ $root.Values.alpineImage.repository }}:{{ $root.Values.alpineImage.tag }}"
@@ -109,11 +109,11 @@ spec:
                   KEEP=$($KEEP *24 * 60)
                   find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \;
               volumeMounts:
-                - name: backupVolume
+                - name: backup-volume
                   mountPath: /backup
           volumes:
-            - name: backupVolume
-              {{- toYaml $root.Values.backupVolume | nindent 14 }}
+            - name: backup-volume
+              {{- toYaml $root.Values.backup-volume | nindent 14 }}
           restartPolicy: OnFailure
           {{- with $root.Values.nodeSelector }}
           nodeSelector:

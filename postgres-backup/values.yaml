@@ -117,6 +117,6 @@ db:
     key: ""
   database: postgres
 
-backupVolume:
+backup-volume:
   persistentVolumeClaim:
     claimName: ""
