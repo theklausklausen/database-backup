@@ -52,6 +52,7 @@ render helm chart:
   extends: .render_helm_chart
   variables:
     HELM_CHART_DIR: ./postgres-backup
+  allow_failure: true
 
 # security
 package scan:

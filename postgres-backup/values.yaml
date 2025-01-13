@@ -119,4 +119,4 @@ db:
   database: postgres
 
 volume:
-  hostPath: /tmp
+  # hostPath: /tmp
