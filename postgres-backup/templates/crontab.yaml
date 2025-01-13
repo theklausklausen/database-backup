@@ -73,7 +73,7 @@ spec:
                     /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql
               volumeMounts:
                 - name: backupvolume
-                  mountPath: {{ $root.Values.mountPath }}
+                  mountPath: /backup
             - name: "{{ $key }}-delete-old-backups"
               image: "{{ $root.Values.alpineImage.repository }}:{{ $root.Values.alpineImage.tag }}"
               imagePullPolicy: {{ $root.Values.alpineImage.pullPolicy }}
