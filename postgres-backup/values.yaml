@@ -119,4 +119,6 @@ db:
   database: postgres
 
 volume:
-  # hostPath: /tmp
+  type: "persistentVolumeClaim"
+  persistentVolumeClaim:
+    claimName: ""
