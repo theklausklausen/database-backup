@@ -119,6 +119,4 @@ db:
   database: postgres
 
 volume:
-  nfs:
-    server: "1.2.3.4"
-    path: "/exported/path"
+  emptyDir: {}
