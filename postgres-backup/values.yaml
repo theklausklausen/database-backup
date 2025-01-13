@@ -119,6 +119,4 @@ db:
   database: postgres
 
 volume:
-  type: "persistentVolumeClaim"
-  persistentVolumeClaim:
-    claimName: ""
+  emptyDir: {}
