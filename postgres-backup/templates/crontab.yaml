@@ -51,12 +51,12 @@ spec:
                 - name: POSTGRES_PORT
                   value: "{{ $root.Values.db.port }}"
                 - name: POSTGRES_USER
-                  from:
+                  valueFrom:
                     secretKeyRef:
                       name: "{{ $root.Values.db.userSecret.name }}"
                       key: "{{ $root.Values.db.userSecret.key }}"
                 - name: POSTGRES_PASSWORD
-                  from:
+                  valueFrom:
                     secretKeyRef:
                       name: "{{ $root.Values.db.passwordSecret.name }}"
                       key: "{{ $root.Values.db.passwordSecret.key }}"
