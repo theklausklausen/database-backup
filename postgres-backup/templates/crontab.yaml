@@ -88,35 +88,32 @@ spec:
               imagePullPolicy: {{ $root.Values.alpineImage.pullPolicy }}
               resources:
                 {{- toYaml $root.Values.resources | nindent 16 }}
+              # if else
+              {{- if $key is 'yearly' }}
+                {{- $older_than_minutes := $value.keep * 365 * 24 * 60 }}
+              {{- else if $key is 'monthly' }}
+                {{- $older_than_minutes := $value.keep * 30 * 24 * 60 }}
+              {{- else if $key is 'weekly' }}
+                {{- $older_than_minutes := $value.keep * 7 * 24 * 60 }}
+              {{- else if $key is 'daily' }}
+                {{- $older_than_minutes := $value.keep * 24 * 60 }}
+              {{- else if $key is 'hourly' }}
+                {{- $older_than_minutes := $value.keep * 60 }}
+              {{- else }}
+                {{- $older_than_minutes := 0 }}
+              {{- end }}
               env:
                 - name: BACKUP_DIR
                   value: /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
-                - name: RETENTION
-                  value: "{{ $key }}"
-                - name: KEEP
-                  value: "{{ $value.keep }}"
+                - name: OLDER_THAN_MINUTES
+                  value: "{{ $older_than_minutes }}"
                 - name: TZ
                   value: "{{ $root.Values.timezone | default "Europe/Berlin" }}"
               command:
                 - /bin/sh
                 - -c
                 - 'echo "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
-                  if [ "$RETENTION" == "yearly" ]; then
-                    KEEP=$(($KEEP * 365))
-                  elif [ "$RETENTION" == "monthly" ]; then
-                    KEEP=$(($KEEP * 30))
-                  elif [ "$RETENTION" == "weekly" ]; then
-                    KEEP=$(($KEEP * 7 * 24))
-                  elif [ "$RETENTION" == "daily" ]; then
-                    KEEP=$(($KEEP))
-                  elif [ "$RETENTION" == "hourly" ]; then
-                    KEEP=$(($KEEP))
-                  else
-                    echo "No valid retention period given"
-                    exit 1
-                  fi
-                  KEEP=$($KEEP *24 * 60)
-                  find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \;'
+                  find $BACKUP_DIR -type f -cmin +$OLDER_THAN_MINUTES -exec rm -f {} \;'
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
