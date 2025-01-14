@@ -110,12 +110,16 @@ retention:
 db:
   host: localhost
   port: 5432
-  userSecret:
-    name: "secret"
-    key: "username"
-  passwordSecret:
-    name: "secret"
-    key: "password"
+  user:
+    valueFrom:
+      secretKeyRef:
+        name: "secret"
+        key: "username"
+  password:
+    valueFrom:
+      secretKeyRef:
+        name: "secret"
+        key: "password"
   database: postgres
 
 volume:
