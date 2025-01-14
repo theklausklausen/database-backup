@@ -88,19 +88,17 @@ spec:
               imagePullPolicy: {{ $root.Values.alpineImage.pullPolicy }}
               resources:
                 {{- toYaml $root.Values.resources | nindent 16 }}
-              # if else
-              {{- if $key is 'yearly' }}
-                {{- $older_than_minutes := $value.keep * 365 * 24 * 60 }}
-              {{- else if $key is 'monthly' }}
-                {{- $older_than_minutes := $value.keep * 30 * 24 * 60 }}
-              {{- else if $key is 'weekly' }}
-                {{- $older_than_minutes := $value.keep * 7 * 24 * 60 }}
-              {{- else if $key is 'daily' }}
-                {{- $older_than_minutes := $value.keep * 24 * 60 }}
-              {{- else if $key is 'hourly' }}
-                {{- $older_than_minutes := $value.keep * 60 }}
-              {{- else }}
-                {{- $older_than_minutes := 0 }}
+              {{- $older_than_minutes := 0 }}
+              {{- if eq $key "yearly" }}
+                {{- $older_than_minutes := mul $value.keep 365 24 60 }}
+              {{- else if eq $key "monthly" }}
+                {{- $older_than_minutes := mul $value.keep 30 24 60 }}
+              {{- else if eq $key "weekly" }}
+                {{- $older_than_minutes := mul $value.keep 7 24 60 }}
+              {{- else if eq $key "daily" }}
+                {{- $older_than_minutes := mul $value.keep 24 60 }}
+              {{- else if eq $key "hourly" }}
+                {{- $older_than_minutes := mul $value.keep 60 }}
               {{- end }}
               env:
                 - name: BACKUP_DIR
