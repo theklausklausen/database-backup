@@ -43,6 +43,8 @@ spec:
                 - name: backupvolume
                   mountPath: /backup
               command:
+                - echo
+                - "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
                 - /bin/sh
                 - -c
                 - mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
@@ -69,6 +71,8 @@ spec:
                 - name: POSTGRES_DB
                   value: "{{ $root.Values.db.database }}"
               command:
+                - echo
+                - "Backup {{ $root.Values.db.database }} to /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql";
                 - /bin/sh
                 - -c
                 - >-
@@ -95,6 +99,8 @@ spec:
                 - name: TZ
                   value: "{{ $root.Values.timezone | default "Europe/Berlin" }}"
               command:
+                - echo
+                - "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
                 - /bin/sh
                 - -c
                 - >-
