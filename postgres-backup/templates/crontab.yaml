@@ -43,11 +43,10 @@ spec:
                 - name: backupvolume
                   mountPath: /backup
               command:
-                - echo
-                - "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
                 - /bin/sh
                 - -c
-                - mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
+                - 'echo "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
+                  mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}'
             - name: "{{ $key }}-backup"
               image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag }}"
               imagePullPolicy: {{ $root.Values.image.pullPolicy }}
@@ -71,16 +70,16 @@ spec:
                 - name: POSTGRES_DB
                   value: "{{ $root.Values.db.database }}"
               command:
-                - echo
-                - "Backup {{ $root.Values.db.database }} to /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql";
                 - /bin/sh
                 - -c
-                - >-
+                - 'echo
+                  "Backup {{ $root.Values.db.database }} to"
+                  /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql";
                   pg_dump 
                     -h $POSTGRES_HOST
                     -p $POSTGRES_PORT
                     -U $POSTGRES_USER $POSTGRES_DB >
-                    /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql
+                    /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql'
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
@@ -99,11 +98,9 @@ spec:
                 - name: TZ
                   value: "{{ $root.Values.timezone | default "Europe/Berlin" }}"
               command:
-                - echo
-                - "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
                 - /bin/sh
                 - -c
-                - >-
+                - 'echo "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
                   if [ "$RETENTION" == "yearly" ]; then
                     KEEP=$(($KEEP * 365))
                   elif [ "$RETENTION" == "monthly" ]; then
@@ -119,7 +116,7 @@ spec:
                     exit 1
                   fi
                   KEEP=$($KEEP *24 * 60)
-                  find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \;
+                  find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \;'
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
