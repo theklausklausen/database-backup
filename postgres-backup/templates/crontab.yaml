@@ -28,7 +28,7 @@ spec:
           annotations:
             {{- toYaml $root.Values.podAnnotations | nindent 12 }}
         spec:
-          ttlSecondsAfterFinished: 180
+          # ttlSecondsAfterFinished: 180
           imagePullSecrets:
             {{- toYaml $root.Values.imagePullSecrets | nindent 12 }}
           serviceAccountName: {{ include "postgres-backup.serviceAccountName" $ }}
