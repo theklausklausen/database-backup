@@ -57,7 +57,7 @@ spec:
                 - 'echo "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
                   mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }};
                   echo
-                  "Backup {{ $root.Values.db.database }} to"
+                  "Backup {{ $root.Values.db.database }} to
                   /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql";
                   pg_dump 
                     -h $POSTGRES_HOST
