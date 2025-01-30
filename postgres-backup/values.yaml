@@ -123,4 +123,4 @@ db:
   database: postgres
 
 volume:
-  emptyDir: {}
+  nfs: {}
