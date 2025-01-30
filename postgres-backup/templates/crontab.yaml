@@ -58,12 +58,13 @@ spec:
                   mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }};
                   echo
                   "Backup {{ $root.Values.db.database }} to
-                  /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql";
+                  /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql";
                   PGPASSWORD=$POSTGRES_PASSWORD pg_dump 
                     -h $POSTGRES_HOST
                     -p $POSTGRES_PORT
                     -U $POSTGRES_USER $POSTGRES_DB >
-                    /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql'
+                    /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql;
+                  echo "Backup done";'
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
@@ -86,15 +87,15 @@ spec:
                 - /bin/sh
                 - -c
                 - 'echo "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
-                  if [ "$RETENTION" == "yearly" ]; then
+                  if [[ "$RETENTION" == "yearly" ]]; then
                     KEEP=$(($KEEP * 365))
-                  elif [ "$RETENTION" == "monthly" ]; then
+                  elif [[ "$RETENTION" == "monthly" ]]; then
                     KEEP=$(($KEEP * 30))
-                  elif [ "$RETENTION" == "weekly" ]; then
+                  elif [[ "$RETENTION" == "weekly" ]]; then
                     KEEP=$(($KEEP * 7 * 24))
-                  elif [ "$RETENTION" == "daily" ]; then
+                  elif [[ "$RETENTION" == "daily" ]]; then
                     KEEP=$(($KEEP))
-                  elif [ "$RETENTION" == "hourly" ]; then
+                  elif [[ "$RETENTION" == "hourly" ]]; then
                     KEEP=$(($KEEP))
                   else
                     echo "No valid retention period given"
