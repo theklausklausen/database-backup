@@ -34,20 +34,7 @@ spec:
           serviceAccountName: {{ include "postgres-backup.serviceAccountName" $ }}
           securityContext:
             {{- toYaml $root.Values.podSecurityContext | nindent 12 }}
-          containers:
-            - name: "{{ $key }}-create-directory"
-              image: "{{ $root.Values.alpineImage.repository }}:{{ $root.Values.alpineImage.tag }}"
-              imagePullPolicy: {{ $root.Values.image.pullPolicy }}
-              resources:
-                {{- toYaml $root.Values.resources | nindent 16 }}
-              volumeMounts:
-                - name: backupvolume
-                  mountPath: /backup
-              command:
-                - /bin/sh
-                - -c
-                - 'echo "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
-                  mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}'
+          initContainers:
             - name: "{{ $key }}-backup"
               image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag }}"
               imagePullPolicy: {{ $root.Values.image.pullPolicy }}
@@ -67,7 +54,9 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'echo
+                - 'echo "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
+                  mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }};
+                  echo
                   "Backup {{ $root.Values.db.database }} to"
                   /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y%m%d%H%M%S).sql";
                   pg_dump 
@@ -78,6 +67,7 @@ spec:
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
+          containers:
             - name: "{{ $key }}-delete-old-backups"
               image: "{{ $root.Values.alpineImage.repository }}:{{ $root.Values.alpineImage.tag }}"
               imagePullPolicy: {{ $root.Values.alpineImage.pullPolicy }}
