@@ -87,20 +87,11 @@ spec:
                 - /bin/sh
                 - -c
                 - 'echo "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
-                  if [[ "$RETENTION" == "yearly" ]]; then
-                    KEEP=$(($KEEP * 365))
-                  elif [[ "$RETENTION" == "monthly" ]]; then
-                    KEEP=$(($KEEP * 30))
-                  elif [[ "$RETENTION" == "weekly" ]]; then
-                    KEEP=$(($KEEP * 7 * 24))
-                  elif [[ "$RETENTION" == "daily" ]]; then
-                    KEEP=$(($KEEP))
-                  elif [[ "$RETENTION" == "hourly" ]]; then
-                    KEEP=$(($KEEP))
-                  else
-                    echo "No valid retention period given"
-                    exit 1
-                  fi
+                  if [[ "$RETENTION" == "yearly" ]]; KEEP=$(($KEEP * 365)); fi
+                  if [[ "$RETENTION" == "monthly" ]]; KEEP=$(($KEEP * 30)); fi
+                  if [[ "$RETENTION" == "weekly" ]]; KEEP=$(($KEEP * 7 * 24)); fi
+                  if [[ "$RETENTION" == "daily" ]]; KEEP=$(($KEEP)); fi
+                  if [[ "$RETENTION" == "hourly" ]]; KEEP=$(($KEEP)); fi
                   KEEP=$($KEEP *24 * 60)
                   find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \;'
               volumeMounts:
