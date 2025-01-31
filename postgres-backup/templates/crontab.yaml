@@ -73,21 +73,21 @@ spec:
                   echo "Backup done";
                   echo "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
                   {{- if eq $key "yearly" }}
-                  KEEP=$(($KEEP * 365 * 24));
+                  KEEP=$((expr $KEEP \* 365 \* 24));
                   {{- end }}
                   {{- if eq $key "monthly" }}
-                  KEEP=$(($KEEP * 30 * 24));
+                  KEEP=$((expr $KEEP \* 30 \* 24));
                   {{- end }}
                   {{- if eq $key "weekly" }}
-                  KEEP=$(($KEEP * 7 * 24));
+                  KEEP=$((expr $KEEP \* 7 \* 24));
                   {{- end }}
                   {{- if eq $key "daily" }}
-                  KEEP=$(($KEEP * 24));
+                  KEEP=$((expr $KEEP \* 24));
                   {{- end }}
                   {{- if eq $key "hourly" }}
-                  KEEP=$(($KEEP));
+                  KEEP=$((expr $KEEP));
                   {{- end }}
-                  KEEP=$($KEEP * 60);
+                  KEEP=$(expr $KEEP \* 60);
                   echo "Delete backups older than $KEEP minutes";
                   find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \;
                   echo "Delete old backups done";'
