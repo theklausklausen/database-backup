@@ -62,7 +62,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                  'echo "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
+                - 'echo "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
                   mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }};
                   echo "Backup {{ $root.Values.db.database }} to /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql";
                   PGPASSWORD=$POSTGRES_PASSWORD pg_dump 
