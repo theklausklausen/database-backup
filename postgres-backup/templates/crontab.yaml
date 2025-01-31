@@ -62,16 +62,16 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'echo "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
-                  mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }};
-                  echo "Backup {{ $root.Values.db.database }} to /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql";
+                - 'echo "Create backup directory $BACKUP_DIR";
+                  mkdir -p $BACKUP_DIR;
+                  echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql";
                   PGPASSWORD=$POSTGRES_PASSWORD pg_dump 
                     -h $POSTGRES_HOST
                     -p $POSTGRES_PORT
                     -U $POSTGRES_USER $POSTGRES_DB >
-                    /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql;
+                    $BACKUP_DIR/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql;
                   echo "Backup done";
-                  echo "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
+                  echo "Delete old backups in $BACKUP_DIR";
                   {{- if eq $key "yearly" }}
                   KEEP=$(expr $KEEP \* 365 \* 24);
                   {{- end }}
