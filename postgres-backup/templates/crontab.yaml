@@ -30,12 +30,22 @@ data:
       /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql
     echo "Backup done"
     echo "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}"
-    if [[ "$RETENTION" == "yearly" ]]; KEEP=$(($KEEP * 365)); fi
-    if [[ "$RETENTION" == "monthly" ]]; KEEP=$(($KEEP * 30)); fi
-    if [[ "$RETENTION" == "weekly" ]]; KEEP=$(($KEEP * 7 * 24)); fi
-    if [[ "$RETENTION" == "daily" ]]; KEEP=$(($KEEP)); fi
-    if [[ "$RETENTION" == "hourly" ]]; KEEP=$(($KEEP)); fi
-    KEEP=$($KEEP *24 * 60)
+    {{- if eq $key "yearly" }}
+    KEEP=$(($KEEP * 365 * 24))
+    {{- end }}
+    {{- if eq $key "monthly" }}
+    KEEP=$(($KEEP * 30 * 24))
+    {{- end }}
+    {{- if eq $key "weekly" }}
+    KEEP=$(($KEEP * 7 * 24))
+    {{- end }}
+    {{- if eq $key "daily" }}
+    KEEP=$(($KEEP * 24))
+    {{- end }}
+    {{- if eq $key "hourly" }}
+    KEEP=$(($KEEP))
+    {{- end }}
+    KEEP=$($KEEP * 60)
     find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \
     echo "Delete old backups done"
 ---
