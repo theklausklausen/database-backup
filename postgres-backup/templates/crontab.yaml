@@ -88,6 +88,7 @@ spec:
                   KEEP=$(($KEEP));
                   {{- end }}
                   KEEP=$($KEEP * 60);
+                  echo "Delete backups older than $KEEP minutes";
                   find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \;
                   echo "Delete old backups done";'
               volumeMounts:
