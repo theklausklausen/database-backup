@@ -100,7 +100,8 @@ spec:
                   value: "{{ $root.Values.db.database }}"
               command:
                 - /bin/sh
-                - /bin/backup.sh
+                - -c
+                - 'cat /bin/backup.sh && /bin/sh /bin/backup.sh'
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
