@@ -10,45 +10,6 @@ metadata:
 {{- range $key, $value := .Values.retention }}
   {{- if $value.enabled | default false }}
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ $root.Values.nameOverride }}-{{ $key }}
-  namespace: {{ $root.Values.namespace }}
-  labels:
-    {{- include "postgres-backup.labels" $ | nindent 4 }}
-data:
-  backup.sh: |
-    #!/bin/sh
-    echo "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}"
-    mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
-    echo "Backup {{ $root.Values.db.database }} to /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql"
-    PGPASSWORD=$POSTGRES_PASSWORD pg_dump 
-      -h $POSTGRES_HOST
-      -p $POSTGRES_PORT
-      -U $POSTGRES_USER $POSTGRES_DB >
-      /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql
-    echo "Backup done"
-    echo "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}"
-    {{- if eq $key "yearly" }}
-    KEEP=$(($KEEP * 365 * 24))
-    {{- end }}
-    {{- if eq $key "monthly" }}
-    KEEP=$(($KEEP * 30 * 24))
-    {{- end }}
-    {{- if eq $key "weekly" }}
-    KEEP=$(($KEEP * 7 * 24))
-    {{- end }}
-    {{- if eq $key "daily" }}
-    KEEP=$(($KEEP * 24))
-    {{- end }}
-    {{- if eq $key "hourly" }}
-    KEEP=$(($KEEP))
-    {{- end }}
-    KEEP=$($KEEP * 60)
-    find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \
-    echo "Delete old backups done"
----
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -101,12 +62,37 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'cat /bin/backup.sh && /bin/sh /bin/backup.sh'
+                  'echo "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
+                  mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }};
+                  echo "Backup {{ $root.Values.db.database }} to /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql";
+                  PGPASSWORD=$POSTGRES_PASSWORD pg_dump 
+                    -h $POSTGRES_HOST
+                    -p $POSTGRES_PORT
+                    -U $POSTGRES_USER $POSTGRES_DB >
+                    /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql;
+                  echo "Backup done";
+                  echo "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
+                  {{- if eq $key "yearly" }}
+                  KEEP=$(($KEEP * 365 * 24));
+                  {{- end }}
+                  {{- if eq $key "monthly" }}
+                  KEEP=$(($KEEP * 30 * 24));
+                  {{- end }}
+                  {{- if eq $key "weekly" }}
+                  KEEP=$(($KEEP * 7 * 24));
+                  {{- end }}
+                  {{- if eq $key "daily" }}
+                  KEEP=$(($KEEP * 24));
+                  {{- end }}
+                  {{- if eq $key "hourly" }}
+                  KEEP=$(($KEEP));
+                  {{- end }}
+                  KEEP=$($KEEP * 60);
+                  find $BACKUP_DIR -type f -cmin +$KEEP -exec rm -f {} \;
+                  echo "Delete old backups done";'
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
-                - name: script
-                  mountPath: /bin/
           volumes:
             - name: backupvolume
               {{- toYaml $root.Values.volume | default "emptyDir: {}" | nindent 14 }}
