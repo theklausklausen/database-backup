@@ -99,8 +99,6 @@ spec:
                 - name: POSTGRES_DB
                   value: "{{ $root.Values.db.database }}"
               command:
-                - cat
-                - /bin/backup.sh;
                 - /bin/sh
                 - /bin/backup.sh
               volumeMounts:
