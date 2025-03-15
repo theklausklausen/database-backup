@@ -65,7 +65,7 @@ spec:
                 - 'echo "Create backup directory $BACKUP_DIR";
                   mkdir -p $BACKUP_DIR;
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-$(date +%Y-%m-%d_%H-%M-%S).sql";
-                  PGPASSWORD=$POSTGRES_PASSWORD pg_dump
+                  PGPASSWORD=$POSTGRES_PASSWORD pg_dump -F c
                     -h $POSTGRES_HOST
                     -p $POSTGRES_PORT
                     -U $POSTGRES_USER 
