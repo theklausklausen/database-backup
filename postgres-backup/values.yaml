@@ -110,7 +110,7 @@ retention:
 db:
   host: localhost
   port: 5432
-  userName: "username"
+  user: "username"
   passwordSecret:
     name: "secret"
     key: "password"
