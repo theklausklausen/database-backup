@@ -110,15 +110,11 @@ retention:
 db:
   host: localhost
   port: 5432
-  userSecret:
-    name: "secret"
-    key: "username"
+  userName: "username"
   passwordSecret:
     name: "secret"
     key: "password"
   database: postgres
 
 volume:
-  nfs:
-    server: "1.2.3.4"
-    path: "/path/to/backup"
+  nfs: {}
