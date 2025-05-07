@@ -77,8 +77,8 @@ spec:
                     -h $POSTGRES_HOST
                     -p $POSTGRES_PORT
                     -U $POSTGRES_USER $POSTGRES_DB >
-                    /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-${TIMESTAMP}.sql'
-                  ln -s /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-${TIMESTAMP}.sql /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.sql
+                    /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-${TIMESTAMP}.sql;
+                  ln -s /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-${TIMESTAMP}.sql /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.sql'
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
