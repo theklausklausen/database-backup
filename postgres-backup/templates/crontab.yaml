@@ -66,6 +66,8 @@ spec:
                       key: "{{ $root.Values.db.passwordSecret.key }}"
                 - name: POSTGRES_DB
                   value: "{{ $root.Values.db.database }}"
+                - name: TZ
+                  value: "{{ $root.Values.timezone | default "Europe/Berlin" }}"
               command:
                 - /bin/sh
                 - -c
