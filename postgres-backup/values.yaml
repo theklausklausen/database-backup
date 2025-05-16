@@ -12,10 +12,10 @@ image:
   tag: "15"
 
 alpineImage:
-  repository: alpine
+  repository: busybox
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "3.7"
+  tag: "1.36.1"
 
 namespace: "postgres-backup"
 
