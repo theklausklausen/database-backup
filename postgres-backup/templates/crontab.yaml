@@ -42,11 +42,14 @@ spec:
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
+              env:
+                - name: BACKUP_DIR
+                  value: /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
               command:
                 - /bin/sh
                 - -c
-                - 'echo "Create backup directory /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
-                  mkdir -p /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}'
+                - 'echo "Create backup directory $BACKUP_DIR";
+                  mkdir -p $BACKUP_DIR'
             - name: "{{ $key }}-backup"
               image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag }}"
               imagePullPolicy: {{ $root.Values.image.pullPolicy }}
@@ -73,16 +76,14 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'echo "Create backup directory $BACKUP_DIR";
-                  mkdir -p $BACKUP_DIR;
-                  TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   PGPASSWORD=$POSTGRES_PASSWORD pg_dump -F t
                     -h $POSTGRES_HOST
                     -p $POSTGRES_PORT
                     -U $POSTGRES_USER $POSTGRES_DB >
-                    /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-${TIMESTAMP}.tar;
-                  ln -s /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
+                    $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar;
+                  ln -s $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
@@ -101,7 +102,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'echo "Delete old backups in /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}";
+                - 'echo "Delete old backups in $BACKUP_DIR older than $OLDER_THAN_MINUTES minutes";
                   find $BACKUP_DIR -type f -cmin +$OLDER_THAN_MINUTES -exec rm -f {} \;'
               volumeMounts:
                 - name: backupvolume
