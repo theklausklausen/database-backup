@@ -68,6 +68,8 @@ spec:
                   value: "{{ $root.Values.db.database }}"
                 - name: TZ
                   value: "{{ $root.Values.timezone | default "Europe/Berlin" }}"
+                - name: BACKUP_DIR
+                  value: /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
               command:
                 - /bin/sh
                 - -c
