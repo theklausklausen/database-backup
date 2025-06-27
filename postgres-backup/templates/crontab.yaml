@@ -61,14 +61,11 @@ spec:
                 - name: POSTGRES_PORT
                   value: "{{ $root.Values.db.port }}"
                 - name: POSTGRES_USER
-                  value: "{{ $root.Values.db.user }}"
+                  {{- toYaml $root.Values.db.user | nindent 18 }}
                 - name: POSTGRES_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: "{{ $root.Values.db.passwordSecret.name }}"
-                      key: "{{ $root.Values.db.passwordSecret.key }}"
+                  {{- toYaml $root.Values.db.password | nindent 18 }}
                 - name: POSTGRES_DB
-                  value: "{{ $root.Values.db.database }}"
+                  value: {{ $root.Values.db.database }}
                 - name: TZ
                   value: "{{ $root.Values.timezone | default "Europe/Berlin" }}"
                 - name: BACKUP_DIR
