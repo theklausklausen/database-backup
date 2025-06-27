@@ -82,8 +82,8 @@ spec:
                     -h $POSTGRES_HOST
                     -p $POSTGRES_PORT
                     -U $POSTGRES_USER $POSTGRES_DB >
-                    $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar;
-                  ln -s $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
+                    $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar || exit 1;
+                  ln -fs $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
