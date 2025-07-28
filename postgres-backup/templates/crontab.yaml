@@ -48,8 +48,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'echo "Create backup directory $BACKUP_DIR";
-                  mkdir -p $BACKUP_DIR'
+                - 'echo "Create backup directory $BACKUP_DIR"; mkdir -p $BACKUP_DIR'
             - name: "{{ $key }}-backup"
               image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag }}"
               imagePullPolicy: {{ $root.Values.image.pullPolicy }}
