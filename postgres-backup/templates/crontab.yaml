@@ -1,12 +1,4 @@
 {{- $root := . -}}
-# ---
-# apiVersion: v1
-# kind: ServiceAccount
-# metadata:
-#   name: {{ include "postgres-backup.serviceAccountName" $ }}
-#   namespace: {{ $root.Values.namespace }}
-#   labels:
-#     {{- include "postgres-backup.labels" $ | nindent 4 }}
 {{- range $key, $value := .Values.retention }}
   {{- if $value.enabled | default false }}
 ---
@@ -30,7 +22,6 @@ spec:
         spec:
           imagePullSecrets:
             {{- toYaml $root.Values.imagePullSecrets | nindent 12 }}
-          # serviceAccountName: {{ include "postgres-backup.serviceAccountName" $ }}
           securityContext:
             {{- toYaml $root.Values.podSecurityContext | nindent 12 }}
           containers:
