@@ -118,7 +118,10 @@ db:
   user:
     value: "postgres"
   password:
-    value: "password"
+    valueFrom:
+      secretKeyRef:
+        name: postgres-backup-db-password
+        key: password
   database: "postgres"
 
 volume:
