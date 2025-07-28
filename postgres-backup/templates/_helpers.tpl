@@ -73,7 +73,7 @@ Calc the maxAge value
 {{- mul 10080 .val2 }}
 {{- else if eq .val1 "daily" }}
 {{- mul 1440 .val2 }}
-{{- else }}
-{{- .val1 }}
+{{- else if eq .val1 "hourly" }}
+{{- mul 60 .val2 }}
 {{- end }}
 {{- end }}
