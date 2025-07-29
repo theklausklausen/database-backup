@@ -46,31 +46,72 @@ spec:
               resources:
                 {{- toYaml $root.Values.resources | nindent 16 }}
               env:
-                - name: POSTGRES_HOST
+                - name: DB_HOST
                   value: "{{ $root.Values.db.host }}"
-                - name: POSTGRES_PORT
+                - name: DB_PORT
                   value: "{{ $root.Values.db.port }}"
-                - name: POSTGRES_USER
+                - name: DB_USER
                   {{- toYaml $root.Values.db.user | nindent 18 }}
-                - name: POSTGRES_PASSWORD
+                - name: DB_PASSWORD
                   {{- toYaml $root.Values.db.password | nindent 18 }}
-                - name: POSTGRES_DB
+                - name: DB_DATABASE
                   value: {{ $root.Values.db.database }}
                 - name: TZ
                   value: "{{ $root.Values.timezone | default "Europe/Berlin" }}"
                 - name: BACKUP_DIR
                   value: /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
+              
+                {{- if eq $root.Values.db.dialect "postgres" }}
               command:
                 - /bin/sh
                 - -c
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
-                  PGPASSWORD=$POSTGRES_PASSWORD pg_dump -F t
-                    -h $POSTGRES_HOST
-                    -p $POSTGRES_PORT
-                    -U $POSTGRES_USER $POSTGRES_DB >
+                  PGPASSWORD=$DB_PASSWORD pg_dump -F t
+                    -h $DB_HOST
+                    -p $DB_PORT
+                    -U $DB_USER $DB_DATABASE >
                     $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar || exit 1;
                   cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
+                {{- else if eq $root.Values.db.dialect "mysql" }}
+                - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                  echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
+                  mysqldump -h $DB_HOST
+                    -P $DB_PORT
+                    -u $DB_USER
+                    -p$DB_PASSWORD $DB_DATABASE |
+                    tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /dev/stdin . || exit 1;
+                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
+                {{- else if eq $root.Values.db.dialect "mariadb" }}
+                - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                  echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
+                  mysqldump -h $DB_HOST
+                    -P $DB_PORT
+                    -u $DB_USER
+                    -p$DB_PASSWORD $DB_DATABASE |
+                    tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /dev/stdin . || exit 1;
+                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
+                {{- else if eq $root.Values.db.dialect "mongo" }}
+                - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                  echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
+                  mongodump --host $DB_HOST
+                    --port $DB_PORT
+                    --username $DB_USER
+                    --password $DB_PASSWORD
+                    --db $DB_DATABASE
+                    --archive=$BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar
+                    --gzip || exit 1;
+                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
+                {{- else if eq $root.Values.db.dialect "redis" }}
+                - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                  echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
+                  redis-cli -h $DB_HOST
+                    -p $DB_PORT
+                    -a $DB_PASSWORD
+                    --rdb $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.rdb || exit 1;
+                  tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C $BACKUP_DIR {{ $root.Values.db.database }}-${TIMESTAMP}.rdb;
+                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
+                {{- end }}
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
