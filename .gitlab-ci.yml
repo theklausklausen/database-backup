@@ -45,13 +45,13 @@ prettier lint:
 helm lint:
   extends: .helm_lint
   variables:
-    HELM_CHART_DIR: ./postgres-backup
+    HELM_CHART_DIR: ./database-backup
 
 # test
 render helm chart:
   extends: .render_helm_chart
   variables:
-    HELM_CHART_DIR: ./postgres-backup
+    HELM_CHART_DIR: ./database-backup
   allow_failure: true
 
 # security

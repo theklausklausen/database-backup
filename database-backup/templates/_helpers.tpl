@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "postgres-backup.name" -}}
+{{- define "database-backup.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "postgres-backup.fullname" -}}
+{{- define "database-backup.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "postgres-backup.chart" -}}
+{{- define "database-backup.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "postgres-backup.labels" -}}
-helm.sh/chart: {{ include "postgres-backup.chart" . }}
-{{ include "postgres-backup.selectorLabels" . }}
+{{- define "database-backup.labels" -}}
+helm.sh/chart: {{ include "database-backup.chart" . }}
+{{ include "database-backup.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "postgres-backup.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "postgres-backup.name" . }}
+{{- define "database-backup.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "database-backup.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "postgres-backup.serviceAccountName" -}}
+{{- define "database-backup.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "postgres-backup.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "database-backup.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
@@ -64,7 +64,7 @@ Create the name of the service account to use
 {{/*
 Calc the maxAge value
 */}}
-{{- define "postgres-backup.maxAge" -}}
+{{- define "database-backup.maxAge" -}}
 {{- if eq .val1 "yearly" }}
 {{- mul 525600 .val2 }}
 {{- else if eq .val1 "monthly" }}

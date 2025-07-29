@@ -32,11 +32,11 @@ yaml:
 	find . -type f -name '*.yaml' -exec yamllint {} \;
 
 lint_helm:
-	helm lint postgres-backup/
+	helm lint database-backup/
 
 helm_render:
-	helm template postgres-backup/
+	helm template database-backup/
 # helm template helm/**
 
 helm_package:
-	helm package postgres-backup/
+	helm package database-backup/

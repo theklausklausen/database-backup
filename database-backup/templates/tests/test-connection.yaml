@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "database-backup.fullname" . }}-test-connection"
+  labels:
+    {{- include "database-backup.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "database-backup.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

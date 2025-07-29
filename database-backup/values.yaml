@@ -1,5 +1,5 @@
 ---
-# Default values for postgres-backup.
+# Default values for database-backup.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -17,10 +17,10 @@ alpineImage:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "1.36.1"
 
-namespace: "postgres-backup"
+namespace: "database-backup"
 
 imagePullSecrets: []
-nameOverride: "postgres-backup"
+nameOverride: "database-backup"
 fullnameOverride: ""
 
 serviceAccount:
@@ -121,7 +121,7 @@ db:
   password:
     valueFrom:
       secretKeyRef:
-        name: postgres-backup-db-password
+        name: database-backup-db-password
         key: password
   database: "postgres"
 

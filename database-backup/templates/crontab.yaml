@@ -8,7 +8,7 @@ metadata:
   name: {{ $root.Values.nameOverride }}-{{ $key }}
   namespace: {{ $root.Values.namespace }}
   labels:
-    {{- include "postgres-backup.labels" $ | nindent 4 }}
+    {{- include "database-backup.labels" $ | nindent 4 }}
 spec:
   schedule: "@{{ $key }}"
   jobTemplate:
@@ -16,7 +16,7 @@ spec:
       template:
         metadata:
           labels:
-            {{- include "postgres-backup.selectorLabels" $ | nindent 12 }}
+            {{- include "database-backup.selectorLabels" $ | nindent 12 }}
           annotations:
             {{- toYaml $root.Values.podAnnotations | nindent 12 }}
         spec:
@@ -124,7 +124,7 @@ spec:
                 - name: BACKUP_DIR
                   value: /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
                 - name: OLDER_THAN_MINUTES
-                  value: "{{- include "postgres-backup.maxAge" (dict "val1" $key "val2" $value.keep) }}"
+                  value: "{{- include "database-backup.maxAge" (dict "val1" $key "val2" $value.keep) }}"
                 - name: TZ
                   value: "{{ $root.Values.timezone | default "Europe/Berlin" }}"
               command:
