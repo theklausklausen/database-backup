@@ -72,6 +72,8 @@ spec:
                     -p $DB_PORT
                     -U $DB_USER $DB_DATABASE >
                     $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar || exit 1;
+                  echo "Backup completed";
+                  echo "Copying latest backup";
                   cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
                 {{- else if eq $root.Values.db.dialect "mysql" }}
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
@@ -81,6 +83,8 @@ spec:
                     -u $DB_USER
                     -p$DB_PASSWORD $DB_DATABASE |
                     tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /dev/stdin . || exit 1;
+                  echo "Backup completed";
+                  echo "Copying latest backup";
                   cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
                 {{- else if eq $root.Values.db.dialect "mariadb" }}
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
@@ -90,6 +94,8 @@ spec:
                     -u $DB_USER
                     -p$DB_PASSWORD $DB_DATABASE |
                     tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /dev/stdin . || exit 1;
+                  echo "Backup completed";
+                  echo "Copying latest backup";
                   cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
                 {{- else if eq $root.Values.db.dialect "mongo" }}
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
@@ -101,6 +107,8 @@ spec:
                     --db $DB_DATABASE
                     --archive=$BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar
                     --gzip || exit 1;
+                  echo "Backup completed";
+                  echo "Copying latest backup";
                   cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
                 {{- else if eq $root.Values.db.dialect "redis" }}
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
@@ -110,6 +118,8 @@ spec:
                     -a $DB_PASSWORD
                     --rdb $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.rdb || exit 1;
                   tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C $BACKUP_DIR {{ $root.Values.db.database }}-${TIMESTAMP}.rdb;
+                  echo "Backup completed";
+                  echo "Copying latest backup";
                   cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
                 {{- end }}
               volumeMounts:
