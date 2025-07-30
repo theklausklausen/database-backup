@@ -140,7 +140,8 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'echo "Delete old backups in $BACKUP_DIR older than $OLDER_THAN_MINUTES minutes";
+                - 'echo "Delete old backups in $BACKUP_DIR older than $OLDER_THAN_MINUTES minutes:";
+                  find $BACKUP_DIR -type f -cmin +$OLDER_THAN_MINUTES -exec ls -lah {} \;
                   find $BACKUP_DIR -type f -cmin +$OLDER_THAN_MINUTES -exec rm -f {} \;'
               volumeMounts:
                 - name: backupvolume
