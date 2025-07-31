@@ -68,8 +68,8 @@ spec:
                   touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   PGPASSWORD=$DB_PASSWORD pg_dump -F t
-                    -h $DB_HOST
-                    -p $DB_PORT
+                    -h ${DB_HOST:-localhost}
+                    -p ${DB_PORT:-5432}
                     -U $DB_USER $DB_DATABASE >
                     $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar || exit 1;
                   echo "Backup completed";
@@ -83,8 +83,8 @@ spec:
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
                   touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
-                  mysqldump -h $DB_HOST
-                    -P $DB_PORT
+                  mysqldump -h ${DB_HOST:-localhost}
+                    -P ${DB_PORT:-3306}
                     -u $DB_USER
                     -p$DB_PASSWORD $DB_DATABASE |
                     tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /dev/stdin . || exit 1;
@@ -99,8 +99,8 @@ spec:
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
                   touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
-                  mysqldump -h $DB_HOST
-                    -P $DB_PORT
+                  mysqldump -h ${DB_HOST:-localhost}
+                    -P ${DB_PORT:-3306}
                     -u $DB_USER
                     -p$DB_PASSWORD $DB_DATABASE |
                     tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /dev/stdin . || exit 1;
@@ -115,8 +115,8 @@ spec:
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
                   touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
-                  mongodump --host $DB_HOST
-                    --port $DB_PORT
+                  mongodump --host ${DB_HOST:-localhost}
+                    --port ${DB_PORT:-27017}
                     --username $DB_USER
                     --password $DB_PASSWORD
                     --db $DB_DATABASE
@@ -133,8 +133,8 @@ spec:
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
                   touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
-                  redis-cli -h $DB_HOST
-                    -p $DB_PORT
+                  redis-cli -h ${DB_HOST:-localhost}
+                    -p ${DB_PORT:-6379}
                     -a $DB_PASSWORD
                     --rdb $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.rdb || exit 1;
                   tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C $BACKUP_DIR {{ $root.Values.db.database }}-${TIMESTAMP}.rdb;
