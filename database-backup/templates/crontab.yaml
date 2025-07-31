@@ -60,12 +60,12 @@ spec:
                   value: "{{ $root.Values.timezone | default "Europe/Berlin" }}"
                 - name: BACKUP_DIR
                   value: /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
-              
-                {{- if eq $root.Values.db.dialect "postgres" }}
+              {{- if eq $root.Values.db.dialect "postgres" }}
               command:
                 - /bin/sh
                 - -c
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                  touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   PGPASSWORD=$DB_PASSWORD pg_dump -F t
                     -h $DB_HOST
@@ -74,9 +74,14 @@ spec:
                     $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar || exit 1;
                   echo "Backup completed";
                   echo "Copying latest backup";
-                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
-                {{- else if eq $root.Values.db.dialect "mysql" }}
+                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar;
+                  echo "Backup process completed successfully"; rm -f $BACKUP_DIR/.lock'
+              {{- else if eq $root.Values.db.dialect "mysql" }}
+              command:
+                - /bin/sh
+                - -c
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                  touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   mysqldump -h $DB_HOST
                     -P $DB_PORT
@@ -85,9 +90,14 @@ spec:
                     tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /dev/stdin . || exit 1;
                   echo "Backup completed";
                   echo "Copying latest backup";
-                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
-                {{- else if eq $root.Values.db.dialect "mariadb" }}
+                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar
+                  echo "Backup process completed successfully"; rm -f $BACKUP_DIR/.lock'
+              {{- else if eq $root.Values.db.dialect "mariadb" }}
+              command:
+                - /bin/sh
+                - -c
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                  touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   mysqldump -h $DB_HOST
                     -P $DB_PORT
@@ -96,9 +106,14 @@ spec:
                     tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /dev/stdin . || exit 1;
                   echo "Backup completed";
                   echo "Copying latest backup";
-                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
-                {{- else if eq $root.Values.db.dialect "mongo" }}
+                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar
+                  echo "Backup process completed successfully"; rm -f $BACKUP_DIR/.lock'
+              {{- else if eq $root.Values.db.dialect "mongo" }}
+              command:
+                - /bin/sh
+                - -c
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                  touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   mongodump --host $DB_HOST
                     --port $DB_PORT
@@ -109,9 +124,14 @@ spec:
                     --gzip || exit 1;
                   echo "Backup completed";
                   echo "Copying latest backup";
-                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
-                {{- else if eq $root.Values.db.dialect "redis" }}
+                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar
+                  echo "Backup process completed successfully"; rm -f $BACKUP_DIR/.lock'
+              {{- else if eq $root.Values.db.dialect "redis" }}
+              command:
+                - /bin/sh
+                - -c
                 - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                  touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   redis-cli -h $DB_HOST
                     -p $DB_PORT
@@ -120,8 +140,9 @@ spec:
                   tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C $BACKUP_DIR {{ $root.Values.db.database }}-${TIMESTAMP}.rdb;
                   echo "Backup completed";
                   echo "Copying latest backup";
-                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar'
-                {{- end }}
+                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar
+                  echo "Backup process completed successfully"; rm -f $BACKUP_DIR/.lock'
+              {{- end }}
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
@@ -138,8 +159,10 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'echo "Delete all but {{ $value.keep }} latest backups in $BACKUP_DIR";
-                  ls -t $BACKUP_DIR | tail -n +{{ add $value.keep 1 }} | xargs -I {} rm -f $BACKUP_DIR/{}'
+                - 'echo "Waiting for lock file to be removed";
+                  timeout 300 sh -c "while [ -f $BACKUP_DIR/.lock ]; do sleep 5; done" || $(echo "Lock file not removed in time, exiting"; exit 1);
+                  echo "Delete all but {{ $value.keep }} latest backups in $BACKUP_DIR";
+                  ls -t $BACKUP_DIR | tail -n +{{ add $value.keep 1 }} | xargs -I {} rm -f $BACKUP_DIR/{} || echo "No old backups to delete"'
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
