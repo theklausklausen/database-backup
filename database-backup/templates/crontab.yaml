@@ -133,16 +133,13 @@ spec:
               env:
                 - name: BACKUP_DIR
                   value: /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/{{ $key }}
-                - name: OLDER_THAN_MINUTES
-                  value: "{{- include "database-backup.maxAge" (dict "val1" $key "val2" $value.keep) }}"
                 - name: TZ
                   value: "{{ $root.Values.timezone | default "Europe/Berlin" }}"
               command:
                 - /bin/sh
                 - -c
-                - 'echo "Delete old backups in $BACKUP_DIR older than $OLDER_THAN_MINUTES minutes:";
-                  find $BACKUP_DIR -type f -cmin +$OLDER_THAN_MINUTES -exec ls -lah {} \;
-                  find $BACKUP_DIR -type f -cmin +$OLDER_THAN_MINUTES -exec rm -f {} \;'
+                - 'echo "Delete all but {{ $value.keep }} latest backups in $BACKUP_DIR";
+                  ls -t $BACKUP_DIR | tail -n +{{ add $value.keep 1 }} | xargs -I {} rm -f $BACKUP_DIR/{}'
               volumeMounts:
                 - name: backupvolume
                   mountPath: /backup
