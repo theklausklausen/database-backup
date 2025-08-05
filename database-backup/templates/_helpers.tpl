@@ -60,20 +60,3 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-{{/*
-Calc the maxAge value
-*/}}
-{{- define "database-backup.maxAge" -}}
-{{- if eq .val1 "yearly" }}
-{{- mul 525600 .val2 }}
-{{- else if eq .val1 "monthly" }}
-{{- mul 43800 .val2 }}
-{{- else if eq .val1 "weekly" }}
-{{- mul 10080 .val2 }}
-{{- else if eq .val1 "daily" }}
-{{- mul 1440 .val2 }}
-{{- else if eq .val1 "hourly" }}
-{{- mul 60 .val2 }}
-{{- end }}
-{{- end }}

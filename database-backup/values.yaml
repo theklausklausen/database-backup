@@ -9,13 +9,13 @@ image:
   repository: postgres
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "15"
+  tag: "17"
 
 alpineImage:
   repository: busybox
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.36.1"
+  tag: "1.37.0"
 
 namespace: "database-backup"
 
@@ -111,11 +111,6 @@ db:
   dialect: "postgres" # Options: postgres, mysql, mariadb, mongo, redis
   host: localhost
   port: 5432
-  # user: "username"
-  # passwordSecret:
-  #   name: "secret"
-  #   key: "password"
-  # database: postgres
   user:
     value: "postgres"
   password:
