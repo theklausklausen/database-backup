@@ -87,6 +87,7 @@ spec:
                     -P ${DB_PORT:-3306}
                     -u $DB_USER
                     -p$DB_PASSWORD $DB_DATABASE > /tmp/{{ $root.Values.db.database }}-${TIMESTAMP}.sql || exit 1;
+                  echo "Backup completed, creating tar archive";
                   tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /tmp {{ $root.Values.db.database }}-${TIMESTAMP}.sql || exit 1;
                   echo "Backup completed";
                   echo "Copying latest backup";
@@ -103,6 +104,7 @@ spec:
                     -P ${DB_PORT:-3306}
                     -u $DB_USER
                     -p$DB_PASSWORD $DB_DATABASE > /tmp/{{ $root.Values.db.database }}-${TIMESTAMP}.sql || exit 1;
+                  echo "Backup completed";
                   tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /tmp {{ $root.Values.db.database }}-${TIMESTAMP}.sql || exit 1;
                   echo "Backup completed";
                   echo "Copying latest backup";
