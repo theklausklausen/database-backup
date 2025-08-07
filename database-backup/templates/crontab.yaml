@@ -91,7 +91,7 @@ spec:
                   tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /tmp {{ $root.Values.db.database }}-${TIMESTAMP}.sql || exit 1;
                   echo "Backup completed";
                   echo "Copying latest backup";
-                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar
+                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar;
                   echo "Backup process completed successfully"; rm -f $BACKUP_DIR/.lock'
               {{- else if eq $root.Values.db.dialect "mariadb" }}
               command:
@@ -108,7 +108,7 @@ spec:
                   tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /tmp {{ $root.Values.db.database }}-${TIMESTAMP}.sql || exit 1;
                   echo "Backup completed";
                   echo "Copying latest backup";
-                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar
+                  cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar;
                   echo "Backup process completed successfully"; rm -f $BACKUP_DIR/.lock'
               {{- else if eq $root.Values.db.dialect "mongo" }}
               command:
