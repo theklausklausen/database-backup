@@ -102,8 +102,8 @@ spec:
                   mysqldump -h ${DB_HOST:-localhost}
                     -P ${DB_PORT:-3306}
                     -u $DB_USER
-                    -p$DB_PASSWORD $DB_DATABASE |
-                    tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /dev/stdin . || exit 1;
+                    -p$DB_PASSWORD $DB_DATABASE > /tmp/{{ $root.Values.db.database }}-${TIMESTAMP}.sql || exit 1;
+                  tar -cf $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar -C /tmp {{ $root.Values.db.database }}-${TIMESTAMP}.sql || exit 1;
                   echo "Backup completed";
                   echo "Copying latest backup";
                   cp -fv $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar /backup/{{ $root.Values.namespace }}/{{ $root.Values.db.database }}/latest.tar
