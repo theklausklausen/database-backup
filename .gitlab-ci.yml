@@ -27,6 +27,7 @@ variables:
   GO_IMAGE: golang:1.23
 
 stages:
+  - tmp
   - security
   - lint
   - test
@@ -34,6 +35,19 @@ stages:
   - package
   - deploy
   - publish
+
+tmp:
+  stage: tmp
+  image: alpine:latest
+  script:
+    - echo "This is a temporary job to create the tmp stage"
+    - nslookup gitlab.kk.int 10.10.100.220
+    - nslookup repo.kk.int 10.10.100.220
+    - nslookup gitlab.kk.int
+    - nslookup repo.kk.int
+    - cat /etc/resolv.conf
+  tags:
+    - arm64
 
 # lint
 markdown lint:
