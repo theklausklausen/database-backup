@@ -64,12 +64,12 @@ secret scan:
 package helm:
   extends: .package_helm_chart
   variables:
-    HELM_CHART_DIR: .
+    HELM_CHART_DIR: ./charts/
     PACKAGE_NAME: ${CI_PROJECT_NAME}
 
 # deploy
 deploy helm:
   extends: .deploy_helm_chart
   variables:
-    HELM_CHART_DIR: .
+    HELM_CHART_DIR: ./charts/
     PACKAGE_NAME: ${CI_PROJECT_NAME}
