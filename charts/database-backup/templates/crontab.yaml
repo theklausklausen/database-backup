@@ -64,7 +64,8 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                - 'pg_isready -h ${DB_HOST:-localhost} -p ${DB_PORT:-5432} -U $DB_USER || (echo "Database is not reachable, exiting"; exit 1);
+                  TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
                   touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   PGPASSWORD=$DB_PASSWORD pg_dump -F t
@@ -80,7 +81,8 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                - 'mysqladmin ping -h ${DB_HOST:-localhost} -P ${DB_PORT:-3306} -u $DB_USER -p$DB_PASSWORD --silent || (echo "Database is not reachable, exiting"; exit 1);
+                  TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
                   touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   mysqldump -h ${DB_HOST:-localhost}
@@ -97,7 +99,8 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                - 'mysqladmin ping -h ${DB_HOST:-localhost} -P ${DB_PORT:-3306} -u $DB_USER -p$DB_PASSWORD --silent || (echo "Database is not reachable, exiting"; exit 1);
+                  TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
                   touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   mysqldump -h ${DB_HOST:-localhost}
@@ -114,7 +117,8 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                - 'mongo --host ${DB_HOST:-localhost} --port ${DB_PORT:-27017} -u $DB_USER -p $DB_PASSWORD --authenticationDatabase admin --eval "db.adminCommand('ping')" || (echo "Database is not reachable, exiting"; exit 1);
+                  TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
                   touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   mongodump --host ${DB_HOST:-localhost}
@@ -132,7 +136,8 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - 'TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+                - 'redis-cli -h ${DB_HOST:-localhost} -p ${DB_PORT:-6379} -a $DB_PASSWORD ping || (echo "Database is not reachable, exiting"; exit 1);
+                  TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
                   touch $BACKUP_DIR/.lock || echo "Lock file already exists";
                   echo "Backup {{ $root.Values.db.database }} to $BACKUP_DIR/{{ $root.Values.db.database }}-${TIMESTAMP}.tar";
                   redis-cli -h ${DB_HOST:-localhost}
