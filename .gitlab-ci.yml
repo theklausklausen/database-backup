@@ -45,13 +45,13 @@ prettier lint:
 helm lint:
   extends: .helm_lint
   variables:
-    HELM_CHART_DIR: ./database-backup
+    HELM_CHART_DIR: ./charts/*
 
 # test
 render helm chart:
   extends: .render_helm_chart
   variables:
-    HELM_CHART_DIR: ./database-backup
+    HELM_CHART_DIR: ./charts/*
   allow_failure: true
 
 # security
@@ -64,12 +64,12 @@ secret scan:
 package helm:
   extends: .package_helm_chart
   variables:
-    HELM_CHART_DIR: .
+    HELM_CHART_DIR: ./charts
     PACKAGE_NAME: ${CI_PROJECT_NAME}
 
 # deploy
 deploy helm:
   extends: .deploy_helm_chart
   variables:
-    HELM_CHART_DIR: .
+    HELM_CHART_DIR: ./charts
     PACKAGE_NAME: ${CI_PROJECT_NAME}
