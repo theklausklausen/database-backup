@@ -13,6 +13,8 @@ spec:
   schedule: "@{{ $key }}"
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 60
+      activeDeadlineSeconds: 1800
       template:
         metadata:
           labels:
