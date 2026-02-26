@@ -21,6 +21,9 @@ include:
   - project: 'klausklausen/templates'
     ref: main
     file: 'security.yml'
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.latest.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
 
 variables:
   TAG: $CI_COMMIT_BRANCH
@@ -55,10 +58,17 @@ render helm chart:
   allow_failure: true
 
 # security
-package scan:
+secret_detection:
+  stage: security
+gitlab-advanced-sast:
+  stage: security
+dependency-scanning:
+  stage: security
+package_scan:
   extends: .package_scan
-secret scan:
-  extends: .secret_scan
+container_scan:
+  extends: .container_scan
+  allow_failure: true
 
 # package
 package helm:
