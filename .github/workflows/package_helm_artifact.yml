@@ -23,7 +23,7 @@ jobs:
         uses: azure/setup-helm@v5
 
       - name: Run Chart Releaser
-        uses: helm/chart-releaser-action@v1.6.0
+        uses: helm/chart-releaser-action@v1.8.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
